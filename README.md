@@ -163,12 +163,3 @@ The confusion matrices show that MobileNetV2 reduces false positives substantial
 ---
 
 
-## CV description
-
-**Pneumonia Detection from Chest X-ray Images Using Deep Learning**
-
-- Developed a deep learning-based pneumonia detection system using chest X-ray images.
-- Designed and trained a custom CNN in TensorFlow/Keras for binary classification of Normal and Pneumonia cases.
-- Applied transfer learning with a pretrained MobileNetV2 and two-stage fine-tuning.
-- Performed image preprocessing, augmentation, class-imbalance handling, model training and evaluation.
-- Compared models using accuracy, precision, recall, F1-score and confusion matrix.
