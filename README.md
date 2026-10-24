@@ -94,34 +94,22 @@ python transfer_learning.py --epochs-frozen 1 --epochs-finetune 1
 python evaluate.py
 ```
 
-Then run the full training (without the `--epochs` flags).
 
-### Useful options
-
-```bash
-python train_cnn.py --epochs 40 --lr 0.0005 --batch-size 16
-python transfer_learning.py --unfreeze-layers 60 --finetune-lr 0.00001
-python transfer_learning.py --skip-finetune             # Stage 1 only
-python evaluate.py --use-final                          # end-of-training models instead of best checkpoints
-python predict.py dataset/test/PNEUMONIA --model models/best_custom_cnn.keras
-python predict.py my_xray.jpeg --show                   # display the image with the prediction
-```
-
-Run any script with `--help` to see all options.
 
 ---
 
 ## Method summary
 
-- **Input:** 224 × 224 RGB (grayscale X-rays repeated to 3 channels).
-- **Split:** 80% train / 20% validation from `dataset/train`; `dataset/test` held out.
-- **Class imbalance:** the dataset has many more PNEUMONIA images, so class weights are applied during training (disable with `--no-class-weights`).
-- **Augmentation (training only):** small rotation (≈ ±10°), zoom (10%), translation (5%). No vertical flips or extreme rotations.
-- **Custom CNN:** 5 × [Conv2D → BatchNorm → ReLU → MaxPool] → GlobalAveragePooling → Dropout → Dense(128) → Dropout → Dense(1, sigmoid). Adam (1e-3), binary cross-entropy.
-- **MobileNetV2:** ImageNet weights, original head removed, new sigmoid head.
-  Stage 1 trains the head with the backbone frozen (Adam 1e-3); Stage 2 unfreezes the top 40 backbone layers (BatchNorm kept frozen) and fine-tunes with Adam 1e-5.
-- **Callbacks:** best-model checkpoint on `val_loss`, early stopping, learning-rate reduction on plateau, CSV training log.
-- Preprocessing (rescaling) is built **inside** each model, so `predict.py` feeds raw images and always matches training.
+This project tackles a binary image-classification problem: determine whether a chest X-ray is normal or pneumonia-positive. The workflow follows a standard deep-learning pipeline for medical image analysis, with careful attention to class imbalance, model selection, and evaluation on a held-out test set.
+
+- **Input data:** Chest X-ray images are resized to 224 × 224 pixels and converted from grayscale to 3-channel RGB by repeating the single channel across the red, green, and blue planes. This keeps the images compatible with pretrained CNN backbones while preserving the original radiographic content.
+- **Dataset split:** The training set is divided into 80% training and 20% validation using a fixed seed (`seed=42`), while the original test set remains completely untouched until final evaluation.
+- **Class imbalance handling:** The Pneumonia class is overrepresented in the dataset, so class weights are applied during training to reduce the model’s bias toward the majority class. This is especially important because in a screening task the cost of missing pneumonia cases is much higher than a false alarm.
+- **Data augmentation:** Only the training images are augmented using small transformations such as rotation (about ±10°), horizontal/vertical shifts, and limited zoom. These augmentations improve generalization without introducing unrealistic distortions that could hide abnormalities in chest radiographs.
+- **Custom CNN architecture:** The first model is a lightweight CNN built from scratch. It consists of stacked convolutional blocks with Batch Normalization, ReLU activation, and max pooling, followed by global average pooling, dropout, and fully connected classification layers. A final sigmoid output produces a probability score for the positive class.
+- **Transfer learning approach:** The second model uses MobileNetV2 pretrained on ImageNet. The original classification head is removed and replaced with a sigmoid output layer. Training is done in two stages: first, the new head is trained while the backbone remains frozen; then, selected upper convolutional layers are unfrozen and fine-tuned with a lower learning rate to adapt the features to chest X-ray classification.
+- **Optimization and regularization:** Both models use binary cross-entropy loss and Adam optimization. Training includes early stopping, learning-rate reduction on plateau, and checkpointing to keep the best validation model rather than the last epoch.
+- **Model-specific preprocessing:** Rescaling is embedded inside each Keras model, so raw images can be passed directly to `predict.py` without manually normalizing them. This ensures the same preprocessing is used consistently during training and inference.
 
 ## Outputs in `results/`
 
@@ -141,7 +129,14 @@ alarm, so report recall alongside accuracy.
 
 ## Results
 
+### ROC curves
+
 ![ROC curves comparison for both models](results/roc_curves.png)
+
+### Confusion matrices
+
+<img src="results/confusion_matrix_custom_cnn.png" alt="Custom CNN confusion matrix" width="420" />
+<img src="results/confusion_matrix_mobilenetv2.png" alt="MobileNetV2 confusion matrix" width="420" />
 
 | Model | Accuracy | Precision | Recall | F1 | Specificity | ROC-AUC |
 |---|---:|---:|---:|---:|---:|---:|
@@ -150,23 +145,10 @@ alarm, so report recall alongside accuracy.
 
 These values were measured on the held-out test set and saved in `results/metrics_summary.csv`.
 
----
-
-## Troubleshooting
-
-| Problem | Fix |
-|---|---|
-| `No module named 'tensorflow'` but you installed it | VS Code is using a different Python. `Ctrl+Shift+P` → *Python: Select Interpreter* → `.venv`. Make sure `(.venv)` shows in the terminal. |
-| PowerShell: *"running scripts is disabled on this system"* | Run once: `Set-ExecutionPolicy -Scope CurrentUser RemoteSigned`, then activate again. |
-| `pip install tensorflow` finds no matching version | Your Python is too new or too old. Install Python 3.11 or 3.12 and recreate `.venv`. |
-| `FileNotFoundError ... Missing: ['NORMAL', ...]` | Dataset layout is wrong (often a nested `chest_xray/chest_xray/` folder). Run `python check_setup.py`. |
-| Out of memory / computer freezes | Use a smaller batch: `--batch-size 16` (or 8). |
-| MobileNetV2 weight download fails | The first run needs internet to fetch the ImageNet weights. |
-| Training is slow | Normal on CPU. Recent TensorFlow versions don't use NVIDIA GPUs natively on Windows; GPU training needs WSL2 or Linux. Use a quick test run to check everything first. |
-| Yellow squiggles under TensorFlow imports in VS Code | A Pylance display quirk with TensorFlow's lazy loading; the code still runs. |
-| Lines like `oneDNN custom operations are on` | Informational TensorFlow messages — safe to ignore. |
+The confusion matrices show that MobileNetV2 reduces false positives substantially compared with the custom CNN while maintaining a very high pneumonia recall. In medical screening, this is important because the model must identify true pneumonia cases while minimizing unnecessary alarms.
 
 ---
+
 
 ## CV description
 
