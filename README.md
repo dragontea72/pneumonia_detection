@@ -94,7 +94,20 @@ python transfer_learning.py --epochs-frozen 1 --epochs-finetune 1
 python evaluate.py
 ```
 
+Then run the full training (without the `--epochs` flags).
 
+### Useful options
+
+```bash
+python train_cnn.py --epochs 40 --lr 0.0005 --batch-size 16
+python transfer_learning.py --unfreeze-layers 60 --finetune-lr 0.00001
+python transfer_learning.py --skip-finetune             # Stage 1 only
+python evaluate.py --use-final                          # end-of-training models instead of best checkpoints
+python predict.py dataset/test/PNEUMONIA --model models/best_custom_cnn.keras
+python predict.py my_xray.jpeg --show                   # display the image with the prediction
+```
+
+Run any script with `--help` to see all options.
 
 ---
 
