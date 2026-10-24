@@ -139,14 +139,16 @@ Run any script with `--help` to see all options.
 model catches. A missed pneumonia (false negative) is usually more serious than a false
 alarm, so report recall alongside accuracy.
 
-## Results (fill in with YOUR measured numbers)
+## Results
+
+![ROC curves comparison for both models](results/roc_curves.png)
 
 | Model | Accuracy | Precision | Recall | F1 | Specificity | ROC-AUC |
-|---|---|---|---|---|---|---|
-| Custom CNN | | | | | | |
-| MobileNetV2 (fine-tuned) | | | | | | |
+|---|---:|---:|---:|---:|---:|---:|
+| Custom CNN | 0.7692 | 0.7330 | 0.9923 | 0.8431 | 0.3974 | 0.9282 |
+| MobileNetV2 (fine-tuned) | 0.8734 | 0.8388 | 0.9872 | 0.9069 | 0.6838 | 0.9718 |
 
-Copy these from `results/metrics_summary.csv`. Only report numbers you actually measured.
+These values were measured on the held-out test set and saved in `results/metrics_summary.csv`.
 
 ---
 
