@@ -1,0 +1,13 @@
+MobileNetV2 (best_mobilenetv2.keras), threshold = 0.5
+
+              precision    recall  f1-score   support
+
+      NORMAL     0.9697    0.6838    0.8020       234
+   PNEUMONIA     0.8388    0.9872    0.9069       390
+
+    accuracy                         0.8734       624
+   macro avg     0.9042    0.8355    0.8545       624
+weighted avg     0.8879    0.8734    0.8676       624
+
+Specificity: 0.6838
+ROC-AUC: 0.9718

@@ -1,0 +1,12 @@
+# Python / VS Code
+.venv/
+venv/
+__pycache__/
+*.pyc
+
+# Large files - do not push to GitHub
+dataset/**/*.jpeg
+dataset/**/*.jpg
+dataset/**/*.png
+models/*.keras
+models/*.h5

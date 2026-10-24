@@ -1,0 +1,55 @@
+{
+    // Press F5 (or open "Run and Debug" in the left sidebar) and pick a step.
+    "version": "0.2.0",
+    "configurations": [
+        {
+            "name": "1. Check setup",
+            "type": "debugpy",
+            "request": "launch",
+            "program": "${workspaceFolder}/check_setup.py",
+            "cwd": "${workspaceFolder}",
+            "console": "integratedTerminal"
+        },
+        {
+            "name": "2. Train custom CNN",
+            "type": "debugpy",
+            "request": "launch",
+            "program": "${workspaceFolder}/train_cnn.py",
+            "cwd": "${workspaceFolder}",
+            "console": "integratedTerminal"
+        },
+        {
+            "name": "3. Train MobileNetV2 (transfer learning)",
+            "type": "debugpy",
+            "request": "launch",
+            "program": "${workspaceFolder}/transfer_learning.py",
+            "cwd": "${workspaceFolder}",
+            "console": "integratedTerminal"
+        },
+        {
+            "name": "4. Evaluate both models",
+            "type": "debugpy",
+            "request": "launch",
+            "program": "${workspaceFolder}/evaluate.py",
+            "cwd": "${workspaceFolder}",
+            "console": "integratedTerminal"
+        },
+        {
+            "name": "5. Predict an X-ray",
+            "type": "debugpy",
+            "request": "launch",
+            "program": "${workspaceFolder}/predict.py",
+            "args": ["${input:imagePath}"],
+            "cwd": "${workspaceFolder}",
+            "console": "integratedTerminal"
+        }
+    ],
+    "inputs": [
+        {
+            "id": "imagePath",
+            "type": "promptString",
+            "description": "Path to a chest X-ray image or folder (leave empty for a random test image)",
+            "default": ""
+        }
+    ]
+}

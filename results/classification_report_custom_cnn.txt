@@ -1,0 +1,13 @@
+Custom CNN (best_custom_cnn.keras), threshold = 0.5
+
+              precision    recall  f1-score   support
+
+      NORMAL     0.9688    0.3974    0.5636       234
+   PNEUMONIA     0.7330    0.9923    0.8431       390
+
+    accuracy                         0.7692       624
+   macro avg     0.8509    0.6949    0.7034       624
+weighted avg     0.8214    0.7692    0.7383       624
+
+Specificity: 0.3974
+ROC-AUC: 0.9282
